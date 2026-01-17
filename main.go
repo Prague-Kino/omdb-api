@@ -14,7 +14,7 @@ import (
 func main() {
 	loadEnv()
 	key := getAPIKey()
-	omdb := api.NewOMDb(key)
+	omdb, err := api.NewOMDb(key)
 
 	movie, err := omdb.FetchMovie("Die my love")
 	if err != nil {
@@ -39,7 +39,7 @@ func getAPIKey() string {
 	return apiKey
 }
 
-func prettyPrint(i interface{}) {
+func prettyPrint(i any) {
 	s, _ := json.MarshalIndent(i, "", "    ")
 	fmt.Println(string(s))
 }

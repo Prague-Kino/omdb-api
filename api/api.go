@@ -1,10 +1,12 @@
 package api
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+
+	e "github.com/Prague-Kino/omdb-api/internal/errors"
+	su "github.com/Prague-Kino/omdb-api/internal/stringutils"
 )
 
 const (
@@ -19,11 +21,14 @@ type OMDb struct {
 	baseURL string
 }
 
-func NewOMDb(apiKey string) *OMDb {
+func NewOMDb(apiKey string) (*OMDb, error) {
+	if su.IsEmpty(apiKey) {
+		return nil, &e.InvalidKeyError{Key: apiKey}
+	}
 	return &OMDb{
 		apiKey:  apiKey,
 		baseURL: OMDB_API_URL,
-	}
+	}, nil
 }
 
 func (o *OMDb) formatRequestURL(params url.Values) string {
@@ -33,13 +38,13 @@ func (o *OMDb) formatRequestURL(params url.Values) string {
 func (o *OMDb) get(url string) ([]byte, error) {
 	res, err := http.Get(url)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch data: %w", err)
+		return nil, err
 	}
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read response: %w", err)
+		return nil, err
 	}
 
 	return body, nil

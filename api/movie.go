@@ -2,10 +2,11 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/url"
 
+	e "github.com/Prague-Kino/omdb-api/internal/errors"
 	m "github.com/Prague-Kino/omdb-api/internal/models"
+	su "github.com/Prague-Kino/omdb-api/internal/stringutils"
 )
 
 const (
@@ -14,6 +15,10 @@ const (
 )
 
 func (o *OMDb) FetchMovie(title string) (*m.Movie, error) {
+	if su.IsEmpty(title) {
+		return nil, &e.InvalidMovieNameError{Title: title}
+	}
+
 	params := url.Values{}
 	params.Add(PARAM_KEY, o.apiKey)
 	params.Add(PARAM_TITLE, title)
@@ -27,11 +32,11 @@ func (o *OMDb) FetchMovie(title string) (*m.Movie, error) {
 
 	var movie m.Movie
 	if err := json.Unmarshal(body, &movie); err != nil {
-		return nil, fmt.Errorf("failed to parse JSON: %w", err)
+		return nil, err
 	}
 
 	if movie.Response != SUCCESSFUL_RESPONSE {
-		return nil, fmt.Errorf("API error: %s", movie.Error)
+		return nil, &e.MovieNotFoundError{Title: title}
 	}
 
 	return &movie, nil
