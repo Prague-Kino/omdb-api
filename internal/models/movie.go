@@ -11,6 +11,5 @@ type Movie struct {
 	Plot       string `json:"Plot"`
 	Poster     string `json:"Poster"`
 	IMDbRating string `json:"imdbRating"`
-	Response   string `json:"Response"`
-	Error      string `json:"Error,omitempty"`
+	APIResponse
 }

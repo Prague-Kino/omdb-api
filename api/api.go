@@ -25,10 +25,18 @@ func NewOMDb(apiKey string) (*OMDb, error) {
 	if su.IsEmpty(apiKey) {
 		return nil, &e.InvalidKeyError{Key: apiKey}
 	}
-	return &OMDb{
+
+	o := &OMDb{
 		apiKey:  apiKey,
 		baseURL: OMDB_API_URL,
-	}, nil
+	}
+
+	err := o.TestAPI()
+	if err != nil {
+		return nil, err
+	}
+
+	return o, nil
 }
 
 func (o *OMDb) formatRequestURL(params url.Values) string {
@@ -48,4 +56,12 @@ func (o *OMDb) get(url string) ([]byte, error) {
 	}
 
 	return body, nil
+}
+
+func (o *OMDb) TestAPI() error {
+	_, err := o.FetchMovie("Twin Peaks Fire Walk With Me")
+	if err != nil {
+		return &e.InvalidKeyError{Key: o.apiKey}
+	}
+	return nil
 }
