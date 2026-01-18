@@ -1,15 +1,12 @@
 package models
 
+import "github.com/Prague-Kino/cast/cast"
+
 type Movie struct {
-	Title      string `json:"Title"`
-	Year       string `json:"Year"`
-	Rated      string `json:"Rated"`
-	Released   string `json:"Released"`
-	Runtime    string `json:"Runtime"`
-	Genre      string `json:"Genre"`
-	Director   string `json:"Director"`
-	Plot       string `json:"Plot"`
-	Poster     string `json:"Poster"`
-	IMDbRating string `json:"imdbRating"`
+	cast.Film
 	APIResponse
+}
+
+func (m *Movie) ToFilm() cast.Film {
+	return m.Film
 }

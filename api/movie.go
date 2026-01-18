@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/url"
 
+	"github.com/Prague-Kino/cast/cast"
 	e "github.com/Prague-Kino/omdb-api/internal/errors"
 	m "github.com/Prague-Kino/omdb-api/internal/models"
 	su "github.com/Prague-Kino/omdb-api/internal/stringutils"
@@ -14,7 +15,7 @@ const (
 	TYPE_MOVIE          = "movie"
 )
 
-func (o *OMDb) FetchMovie(title string) (*m.Movie, error) {
+func (o *OMDb) FetchMovie(title string) (*cast.Film, error) {
 	if su.IsEmpty(title) {
 		return nil, &e.InvalidMovieNameError{Title: title}
 	}
@@ -39,5 +40,6 @@ func (o *OMDb) FetchMovie(title string) (*m.Movie, error) {
 		return nil, &e.MovieNotFoundError{Title: title}
 	}
 
-	return &movie, nil
+	film := movie.ToFilm()
+	return &film, nil
 }
