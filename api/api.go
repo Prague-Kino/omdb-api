@@ -10,12 +10,7 @@ import (
 	"github.com/Prague-Kino/omdb-api/internal/errors"
 )
 
-const (
-	OmdbApiUrl = "http://www.omdbapi.com/"
-	ParamKey   = "apikey"
-	ParamTitle = "t"
-	ParamType  = "type"
-)
+const OmdbApiUrl = "http://www.omdbapi.com/"
 
 type OMDb struct {
 	apiKey  string
