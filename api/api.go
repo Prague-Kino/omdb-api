@@ -1,17 +1,20 @@
 package api
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+
+	"github.com/Prague-Kino/omdb-api/internal/enums/searchparams"
+	"github.com/Prague-Kino/omdb-api/internal/enums/searchtype"
+	"github.com/Prague-Kino/omdb-api/internal/errors"
 )
 
 const (
-	OMDB_API_URL = "http://www.omdbapi.com/"
-	PARAM_KEY    = "apikey"
-	PARAM_TITLE  = "t"
-	PARAM_TYPE   = "type"
+	OmdbApiUrl = "http://www.omdbapi.com/"
+	ParamKey   = "apikey"
+	ParamTitle = "t"
+	ParamType  = "type"
 )
 
 type OMDb struct {
@@ -22,7 +25,7 @@ type OMDb struct {
 func NewOMDb(apiKey string) *OMDb {
 	return &OMDb{
 		apiKey:  apiKey,
-		baseURL: OMDB_API_URL,
+		baseURL: OmdbApiUrl,
 	}
 }
 
@@ -33,14 +36,33 @@ func (o *OMDb) formatRequestURL(params url.Values) string {
 func (o *OMDb) get(url string) ([]byte, error) {
 	res, err := http.Get(url)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch data: %w", err)
+		return nil, &errors.HttpGetError{
+			Url: url,
+			Err: err,
+		}
 	}
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read response: %w", err)
+		return nil, &errors.InvalidResponseError{
+			Url: url,
+			Err: err,
+		}
 	}
 
 	return body, nil
+}
+
+func (o *OMDb) setupSearchParams(title string, year ...string) url.Values {
+	params := url.Values{}
+	params.Add(searchparams.Key, o.apiKey)
+	params.Add(searchparams.Title, title)
+	params.Add(searchparams.Type, searchtype.Movie.String())
+
+	if len(year) > 0 {
+		params.Add(searchparams.Year, year[0])
+	}
+
+	return params
 }

@@ -2,22 +2,24 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
-	"net/url"
 
-	m "github.com/Prague-Kino/omdb-api/internal/models"
+	"github.com/Prague-Kino/omdb-api/internal/errors"
+	"github.com/Prague-Kino/omdb-api/models"
 )
 
 const (
-	SUCCESSFUL_RESPONSE = "True"
-	TYPE_MOVIE          = "movie"
+	SuccessfulResponse = "True"
+	ParamTypeMovie     = "movie"
+	ParamYear          = "y"
 )
 
-func (o *OMDb) FetchMovie(title string) (*m.Movie, error) {
-	params := url.Values{}
-	params.Add(PARAM_KEY, o.apiKey)
-	params.Add(PARAM_TITLE, title)
-	params.Add(PARAM_TYPE, TYPE_MOVIE)
+// Fetch a movie's data by its title and release year.
+//
+// title - the name of the movie
+//
+// year (optional) - year of release
+func (o *OMDb) FetchMovie(title string, year ...string) (*models.Movie, error) {
+	params := o.setupSearchParams(title, year...)
 
 	requestURL := o.formatRequestURL(params)
 	body, err := o.get(requestURL)
@@ -25,13 +27,19 @@ func (o *OMDb) FetchMovie(title string) (*m.Movie, error) {
 		return nil, err
 	}
 
-	var movie m.Movie
+	var movie models.Movie
 	if err := json.Unmarshal(body, &movie); err != nil {
-		return nil, fmt.Errorf("failed to parse JSON: %w", err)
+		return nil, &errors.InvalidAPIResponse{
+			Err:  err,
+			Body: body,
+		}
 	}
 
-	if movie.Response != SUCCESSFUL_RESPONSE {
-		return nil, fmt.Errorf("API error: %s", movie.Error)
+	if movie.Response != SuccessfulResponse {
+		return nil, &errors.OmdbAPIError{
+			Err:        movie.Error,
+			RequestURL: requestURL,
+		}
 	}
 
 	return &movie, nil
