@@ -13,6 +13,8 @@ type Movie struct {
 	Runtime    string `json:"Runtime"`
 	Genre      string `json:"Genre"`
 	Director   string `json:"Director"`
+	Country    string `json:"Country"`
+	Language   string `json:"Language"`
 	Plot       string `json:"Plot"`
 	Poster     string `json:"Poster"`
 	IMDbRating string `json:"imdbRating"`
