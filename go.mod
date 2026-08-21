@@ -1,3 +1,7 @@
 module github.com/Prague-Kino/omdb-api
 
 go 1.25.6
+
+require github.com/stretchr/testify v1.12.1
+
+require go.yaml.in/yaml/v3 v3.0.5 // indirect
